@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>BankNote Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            box-sizing: border-box;
+        }
+
+        .header{
+            text-align: center;
+            padding: 15px 0;
+        }
+
+        .input-item{
+            display: block;
+            padding: 10px;    
+        }
+
+        .row{
+            display: flex;
+        }
+
+        .col{
+            flex: 1;
+            max-height: calc(100vh - 60px);
+        }
+
+        .button{
+            max-width: 80px !important;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image, .result{
+            min-width: 45%;
+        }
+
+        .image img, .result img{
+            width: 100%;
+        }
+
+
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1> Detector de Billetes (Soles) </h1>
+    </div>
+    <div class="body">
+        <div class="row">
+            <div class="col image">
+                <img id="image" src="" alt="">
+                <input id="image-input" type="file" name="image" onchange="readURL(this)">
+            </div>
+            <div class="col button">
+                <button id="submit"> Enviar</button>
+            </div>
+            <div class="col result">
+                <img id="image1" src="" alt="">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.1/axios.js"></script>
+    <script>
+        function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('image').src = e.target.result 
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function dataURItoBlob(dataURI, callback) {
+            // convert base64 to raw binary data held in a string
+            // doesn't handle URLEncoded DataURIs - see SO answer #6850276 for code that does this
+            var byteString = atob(dataURI);
+
+            // separate out the mime component
+            var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+
+            // write the bytes of the string to an ArrayBuffer
+            var ab = new ArrayBuffer(byteString.length);
+            var ia = new Uint8Array(ab);
+            for (var i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+
+            // write the ArrayBuffer to a blob, and you're done
+            var bb = new BlobBuilder();
+            bb.append(ab);
+            return bb.getBlob(mimeString);
+        }
+
+        document.getElementById('submit').addEventListener('click', function(){
+            let image = document.getElementById('image-input').files[0]
+            let fd= new FormData()
+            fd.append('image', image)
+
+            axios({
+                method: 'post',
+                url: '',
+                data: fd,
+                headers: {
+                    "content-type": "multipart/form-data"
+                }
+            }).then(function (response) {
+                console.log(response.data.image_url)
+                document.getElementById('image1').src = "/" + response.data.image_url 
+
+            })
+        })
+
+    
+    </script>
+</body>
+</html>
